@@ -19,6 +19,12 @@ class MyWidget(QWidget):
         self.connect_btn.clicked.connect(partial(self.controller.connect))
         self.msgBox = self.findChild(QLineEdit, 'sentMsg')
 
+        self.send_btn = self.findChild(QPushButton, 'send_button')
+        self.send_btn.clicked.connect(self.send_command)
+
+    def send_command(self):
+        self.controller.send(self.controller.command)
+
     def define_text_source(self, name):
         child = self.findChild(QLineEdit, name)
         text_source = TextSource(child)

@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,2,10,0,1,2">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,2,10,0,0,1,2">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,1,0,1,0,1,0,0,2,0">
        <item>
@@ -270,6 +270,13 @@
         </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="send_button">
+       <property name="text">
+        <string>Send</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="command">

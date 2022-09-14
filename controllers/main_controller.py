@@ -9,6 +9,7 @@ from functools import partial
 
 
 commands = {
+    "" : {},
     "6" : {
             "name": "stop",
             "address": "6",
@@ -80,6 +81,7 @@ class Controller:
 
             paramBox.connect(changeCommandLabel)
 
+        self.command = command.get_command()
         self.win.findChild(QLabel, 'command').setText(command.get_command())
 
     def show(self):
