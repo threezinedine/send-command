@@ -10,10 +10,11 @@ class Property(IProperty):
     BYTE_LENGTH = 2
     DEFAULT_VAL = "0"
 
-    def __init__(self, num_bytes:int, text_source:ITextSource=None):
+    def __init__(self, num_bytes:int, text_source:ITextSource=None, is_reverse=False):
         self.__text_source = text_source
         self.__text_source.set_text(self.DEFAULT_VAL)
         self.__num_bytes = num_bytes
+        self.__is_reverse = is_reverse
 
     def __is_full_format(self, hex_string):
         return len(hex_string) % self.BYTE_LENGTH != 0
@@ -30,15 +31,28 @@ class Property(IProperty):
 
     def _get_bytes_array(self):
         int_text = self.__text_source.get_text()
+        print(self.__text_source.get_text())
 
         if int_text == self.EMPTY_STRING:
             return [self.EMPTY_BYTES, self.EMPTY_BYTES]
         else: 
-            int_value = int(self.__text_source.get_text())
+            if int_text[0] == '-':
+                if len(int_text) == 1:
+                    int_value = 0
+                else:
+                    int_value = 2 ** (self.__num_bytes * 8) - int(int_text[1:])
+                    print(int_text)
+            else:
+                int_value = int(self.__text_source.get_text())
+
             result_strs = self._convert_hex_string_to_right_format(str(hex(int_value))[2:])
             while len(result_strs) < self.__num_bytes:
                 result_strs = [self.EMPTY_BYTES] + result_strs
-            return result_strs
+            
+            if self.__is_reverse:
+                return reversed(result_strs)
+            else:
+                return result_strs
 
 
     def get_hex_string(self) -> str:

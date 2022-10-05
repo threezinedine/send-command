@@ -15,15 +15,49 @@ commands = {
             "address": "6",
             "properties": [None, None, None, None, None, None]
         }, 
-    "4": {
+    "5": {
             "name": "run",
-            "address": "4",
+            "address": "5",
             "properties": [None, None, None, None, {'label':'Program', 'description': 'The program that the robot will run'}, None]
         },
-    "5": {
-            "name": "read encoder",
-            "address": "5",
-            "properties": [None, None, None, None, {'label': 'Channel', 'description': 'The output channel of the encoder'}, {'label': 'I/O port'}]
+    "4": {
+            "name": "reset",
+            "address": "4",
+            "properties": [None, None, None, None, None, None]
+        },
+    "12": {
+            "name": "control output",
+            "address": "12",
+            "properties": [{'label': 'IO out put', 'reverse': True}, {'label': 'Status', 'reverse': True}, None, None, None, None]
+        },
+    "14": {
+        "name": "read encoder",
+        "address": "14",
+        "properties": [None, None, None, None, {'label': 'IO out put'}, {'label': 'Encoder'}]
+        },
+    "1": {
+        "name": "move",
+        "address": "1",
+        "properties": [
+            {"label": 'X'},
+            {'label': 'Y'},
+            {'label': 'Z'},
+            {'label': 'Angle'},
+            {'label': 'Encoder'},
+            {'label': 'Run'}
+            ]
+        },
+    "3": {
+        "name": "move directly",
+        "address": "3",
+        "properties": [
+            {"label": 'X', 'reverse': True},
+            {'label': 'Y', 'reverse': True},
+            {'label': 'Z', 'reverse': True},
+            {'label': 'Angle', 'reverse': True},
+            {'label': 'Speed', 'reverse': True},
+            None
+            ]
         }
 }
 
@@ -39,7 +73,8 @@ class Controller:
         self.function_source.toggle_state(False)
         self.function_source.connect(self.update_param)
 
-        self.function_property = Property(2, self.function_source)
+        self.function_property = Property(2, self.function_source, is_reverse=False)
+        self.command = None
 
     def update_param(self):
         if self.function_source.get_text() in commands.keys():
@@ -63,7 +98,7 @@ class Controller:
         paramBoxes = [self.win.define_text_source(f'param{index}_text') for index in range(1, 7)]
         paramLabels = [self.win.findChild(QLabel, f'param{index}_label') for index in range(1, 7)]
 
-        commandParams = [Property(4, paramBox) if prop is not None else None for prop, paramBox in zip(data["properties"], paramBoxes)]
+        commandParams = [Property(4, paramBox, is_reverse=True if 'reverse' in prop.keys() else False) if prop is not None else None for prop, paramBox in zip(data["properties"], paramBoxes)]
         command = Command(data["name"], self.function_property, commandParams)
 
         for prop, paramLabel, paramBox in zip(data["properties"], paramLabels, paramBoxes):
@@ -76,12 +111,13 @@ class Controller:
                 if 'description' in prop.keys():
                     paramLabel.setToolTip(prop['description'])
 
+            self.command = command.get_command()
             def changeCommandLabel():
                 self.win.findChild(QLabel, 'command').setText(command.get_command())
+                self.command = command.get_command()
 
             paramBox.connect(changeCommandLabel)
 
-        self.command = command.get_command()
         self.win.findChild(QLabel, 'command').setText(command.get_command())
 
     def show(self):
@@ -98,10 +134,11 @@ class Controller:
             self.socket = self._socket_type(ip, port)
         except Exception as e:
             print("[ERROR] Cannot connect to server...")
-            self.win.set_error(e)
+            self.win.set_error(str(e))
 
     def send(self, data):
         try: 
+            print(convert_string_to_hex(data))
             self.socket.send(data)
 
             received_data = self.socket.recv()
@@ -112,3 +149,9 @@ class Controller:
         except Exception as e:
             print(f"[ERROR] {e}")
             self.win.set_error(str(e))
+
+    def disconnect(self):
+        print("Exit")
+        self.socket.close()
+
+

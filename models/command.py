@@ -15,7 +15,9 @@ class Command(ICommand):
     def get_command(self):
         address_string = self.__address.get_hex_string()
 
+        print(self.__params)
         param_strings = [param.get_hex_string() if param is not None else "00 00 00 00" for param in self.__params]
+        print(f"Param String: {param_strings}")
         return f"{Command.START_FRAME_BYTES} {Command.LENGTH_FRAME_BYTES} {address_string} {' '.join(param_strings)}"
 
     def get_hex_command(self):

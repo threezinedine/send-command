@@ -22,7 +22,16 @@ class MyWidget(QWidget):
         self.send_btn = self.findChild(QPushButton, 'send_button')
         self.send_btn.clicked.connect(self.send_command)
 
+        self.disconnect_btn = self.findChild(QPushButton, 'disconnect_btn')
+        self.disconnect_btn.clicked.connect(self.controller.disconnect)
+
+        self.hex_str_label = self.findChild(QLabel, 'hexstr')
+
+    def change_hex_str_label(self, msg):
+        pass
+
     def send_command(self):
+        print(self.controller.command)
         self.controller.send(self.controller.command)
 
     def define_text_source(self, name):
@@ -46,7 +55,9 @@ class MyWidget(QWidget):
         self.findChild(QLineEdit, 'receivedMsg').setText(data)
 
     def set_error(self, msg):
+        print(msg)
         self.findChild(QLabel, 'errorMsg').setText(msg)
 
     def reset_command(self):
         self.findChild(QLabel, 'command').setText("")
+
